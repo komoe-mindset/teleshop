@@ -1,0 +1,5 @@
+project_id = "teleshop"
+[functions.connect-bot]
+verify_jwt = false
+[functions.telegram-webhook]
+verify_jwt = false
