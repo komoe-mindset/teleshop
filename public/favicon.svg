@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2c225a"/>
+      <stop offset="100%" stop-color="#0c0d1d"/>
+    </linearGradient>
+  </defs>
+  <!-- Background rounded card -->
+  <rect width="64" height="64" rx="16" fill="url(#bg)"/>
+  <rect width="64" height="64" rx="16" fill="none" stroke="#7061ed" stroke-width="2.5" opacity="0.7"/>
+  
+  <!-- TeleShop Spark ✦ -->
+  <path d="M32 8 C32 21 21 32 8 32 C21 32 32 43 32 56 C32 43 43 32 56 32 C43 32 32 21 32 8 Z" fill="#c1baff"/>
+  
+  <!-- Glowing center core -->
+  <circle cx="32" cy="32" r="3.5" fill="#ffffff"/>
+</svg>
+
