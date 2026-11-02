@@ -1,1 +1,153 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>TeleShop Dashboard</title><link rel="stylesheet" href="style.css"></head><body><header><strong>✦ TeleShop</strong><button id="logout" hidden>Sign out</button></header><main><section id="config"><h1>Set up TeleShop</h1><p>Enter your Supabase project URL and publishable key. These values are stored in this browser.</p><form id="configForm"><label>Project URL<input id="url" type="url" required placeholder="https://your-project.supabase.co"></label><label>Publishable key<input id="key" required placeholder="sb_publishable_… or anon key"></label><button>Save configuration</button></form></section><section id="auth" hidden><p class="eyebrow">YOUR TELEGRAM SHOP</p><h1>Welcome to TeleShop</h1><p>Sign in to manage your bot and products.</p><form id="authForm"><label>Email<input id="email" type="email" required autocomplete="email"></label><label>Password<input id="password" type="password" required minlength="6" autocomplete="current-password"></label><div class="actions"><button>Sign in</button><button type="button" id="signup" class="secondary">Create account</button></div></form><button id="reconfigure" class="link">Change Supabase project</button></section><section id="dashboard" hidden><div class="intro"><div><p class="eyebrow">MERCHANT DASHBOARD</p><h1>Your shop, connected.</h1><p>Manage your Telegram bot and product catalog in one place.</p></div><span class="badge">EARLY ACCESS</span></div><div class="grid"><article><h2>01 &nbsp; Connect your bot</h2><p>Create a bot with @BotFather, then paste its token here. Connecting replaces any existing webhook for this bot.</p><p id="botStatus">Loading connection…</p><form id="botForm"><label>Bot token<input id="token" type="password" required autocomplete="off" placeholder="123456:ABC…"></label><button>Connect bot</button></form><small>Sent to your server function for encrypted storage; never shown again.</small></article><article><h2>02 &nbsp; Add a product</h2><form id="productForm"><label>Product name<input id="name" maxlength="120" required></label><label>Description<textarea id="description" maxlength="2000"></textarea></label><div class="row"><label>Price (minor units)<input id="price" type="number" min="0" max="1000000000" step="1" required></label><label>Currency code<input id="currency" value="MMK" pattern="[A-Za-z]{3}" maxlength="3" required></label><label>Stock<input id="stock" type="number" min="0" max="1000000" step="1" required></label></div><button id="saveProduct">Add product</button><button type="button" id="cancelEdit" class="secondary" hidden>Cancel edit</button></form><small>Use the smallest currency unit, such as cents for USD. For MMK, enter whole kyat.</small></article></div><article><h2>Your products</h2><div id="products">Loading…</div></article><div class="future">Coming next: customer orders · manual payments and cash on delivery · FAQs · CSV import</div></section><div id="notice" role="status" aria-live="polite"></div></main><script type="module" src="app.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TeleShop Merchant Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <strong>✦ TeleShop</strong>
+    <div class="user-bar">
+      <span id="userEmail" class="user-email"></span>
+      <button id="logout" hidden>Sign out</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Shown only if the platform owner has not yet configured public/config.js -->
+    <section id="setupNotice" hidden>
+      <div class="alert-box">
+        <p class="eyebrow">PLATFORM SETUP REQUIRED</p>
+        <h1>Platform Configuration Needed</h1>
+        <p>This TeleShop instance is not yet connected to a Supabase project.</p>
+        <div class="setup-instructions">
+          <p><strong>For the platform owner:</strong></p>
+          <ol>
+            <li>Open <code>public/config.js</code> in your editor.</li>
+            <li>Add your shared Supabase project URL and publishable (anon) key.</li>
+            <li>Save the file and refresh this page.</li>
+          </ol>
+          <small>Never place your Supabase service-role secret key or bot encryption key in frontend files.</small>
+        </div>
+      </div>
+    </section>
+
+    <!-- Merchant Authentication (Sign in / Create Account) -->
+    <section id="auth" hidden>
+      <p class="eyebrow">MERCHANT PORTAL</p>
+      <h1>Welcome to TeleShop</h1>
+      <p>Sign in to manage your Telegram shop, products, and inventory.</p>
+
+      <form id="authForm" novalidate>
+        <label for="email">
+          Email address
+          <input id="email" type="email" required autocomplete="email" placeholder="merchant@example.com">
+        </label>
+        <label for="password">
+          Password
+          <input id="password" type="password" required minlength="6" autocomplete="current-password" placeholder="At least 6 characters">
+        </label>
+        <div class="actions">
+          <button id="signinBtn" type="submit">Sign in</button>
+          <button id="signupBtn" type="button" class="secondary">Create merchant account</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Merchant Dashboard -->
+    <section id="dashboard" hidden>
+      <div class="intro">
+        <div>
+          <p class="eyebrow">MERCHANT DASHBOARD</p>
+          <h1>Your shop, connected.</h1>
+          <p>Manage your connected Telegram bot and physical product catalog.</p>
+        </div>
+        <span class="badge">SHARED PLATFORM</span>
+      </div>
+
+      <div class="grid">
+        <!-- 01: Bot Connection -->
+        <article>
+          <h2>01 &nbsp; Connect your Telegram bot</h2>
+          <p>Create a bot via <a href="https://t.me/BotFather" target="_blank" rel="noopener">@BotFather</a> in Telegram, then paste its bot token below.</p>
+
+          <div class="warning-callout">
+            <strong>⚠️ Important Notice</strong>
+            <p>Connecting a bot replaces its active webhook. If this bot token is currently used by another service, that service will stop receiving updates.</p>
+          </div>
+
+          <p id="botStatus">Checking bot connection…</p>
+
+          <form id="botForm">
+            <label for="token">
+              Bot token
+              <input id="token" type="password" required autocomplete="off" placeholder="123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ">
+            </label>
+            <button id="connectBotBtn" type="submit">Connect bot</button>
+          </form>
+          <small>The token is encrypted with AES-GCM on the server before storage. It is never exposed to browser users.</small>
+        </article>
+
+        <!-- 02: Add / Edit Product -->
+        <article>
+          <h2 id="productFormTitle">02 &nbsp; Add a product</h2>
+          <form id="productForm">
+            <label for="name">
+              Product name
+              <input id="name" maxlength="120" required placeholder="e.g. Handmade Leather Wallet">
+            </label>
+
+            <label for="description">
+              Description
+              <textarea id="description" maxlength="2000" placeholder="Product details, dimensions, materials..."></textarea>
+            </label>
+
+            <div class="row">
+              <label for="price">
+                Price (minor units)
+                <input id="price" type="number" min="0" max="1000000000" step="1" required placeholder="e.g. 1500">
+              </label>
+
+              <label for="currency">
+                Currency code
+                <input id="currency" value="MMK" pattern="[A-Za-z]{3}" maxlength="3" required placeholder="USD or MMK">
+              </label>
+
+              <label for="stock">
+                Stock quantity
+                <input id="stock" type="number" min="0" max="1000000" step="1" required placeholder="0">
+              </label>
+            </div>
+
+            <div class="actions">
+              <button id="saveProduct" type="submit">Add product</button>
+              <button type="button" id="cancelEdit" class="secondary" hidden>Cancel edit</button>
+            </div>
+          </form>
+          <small>Prices are stored in integer minor units (e.g. cents for USD; whole kyat for MMK). Validated against database constraints.</small>
+        </article>
+      </div>
+
+      <!-- Product Catalog List -->
+      <article>
+        <div class="section-header">
+          <h2>Your product catalog</h2>
+          <span id="productCount" class="count-badge">0 products</span>
+        </div>
+        <div id="products">Loading products…</div>
+      </article>
+
+      <div class="future">
+        ✦ Coming next in future milestones: Customer Telegram orders · Cash on delivery & manual payment receipt verification · Storefront FAQs
+      </div>
+    </section>
+
+    <!-- Toast Notifications -->
+    <div id="notice" role="status" aria-live="polite"></div>
+  </main>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
