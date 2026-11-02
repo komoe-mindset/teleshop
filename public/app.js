@@ -320,7 +320,8 @@ async function deleteProduct(p) {
     const { error } = await client
       .from('products')
       .delete()
-      .eq('id', p.id);
+      .eq('id', p.id)
+      .eq('merchant_id', currentUser.id);
 
     if (error) throw error;
 
@@ -391,7 +392,8 @@ $('productForm').onsubmit = async (e) => {
       const { error } = await client
         .from('products')
         .update(productData)
-        .eq('id', editingId);
+        .eq('id', editingId)
+        .eq('merchant_id', currentUser.id);
       resultError = error;
     } else {
       const { error } = await client
